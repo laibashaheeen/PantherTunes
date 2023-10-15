@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+   <meta charset="utf-8">
+   <title>Your Posts</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<script>
+   path = window.location.hostname
+   if (path == '127.0.0.1') {
+      path += ':1601'
+   }
+   // else if (window.location.protocol != 'https:'){
+   //     window.location.href = 'https://domain/sign-in'
+   // }
+
+   var window_url = window.location.protocol + '//' + path;
+   redirect_to = 'profile'
+   let url_string = window.location.href//if there is a redirect value in url it means we need to remember where to rediretc the user to once signed in
+   let url = new URL(url_string);
+   let c = url.searchParams.get('redirect');
+   if (c != null) {
+      redirect_to = c;
+   }
+
+   function delete_post(event) {
+      data = {
+         'action': 'delete',
+         'post_id': event.target.id
+      };
+      httpGetAsyncPost(window_url + '/profile', end_func, data);
+   }
+
+   function like(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes + 1;
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("i-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'like',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes - 1;
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("i-" + ID.substring(8)).style.color = "white";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unlike',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function save(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Saved";
+         {% endif %}
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("si-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'save',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Save";
+         {% endif %}
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("si-" + ID.substring(8)).style.color = "white";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unsave',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function action_stored(data) {
+      data = JSON.parse(data);
+      if (data['state'] != 'success') {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function end_func(data) {
+      data = JSON.parse(data)
+      if (data['state'] == 'success') {
+         if (redirect_to != '') {
+            redirect_to = '/' + redirect_to;
+         }
+         window.location.href = window_url + redirect_to;
+      } else {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function httpGetAsyncPost(theUrl, callback, data) {
+      //alert(JSON.stringify(data));
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function () {
+         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+         }
+      }
+      xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+      //alert('c');
+      xmlHttp.send(JSON.stringify(data));
+      //alert('d');
+   }
+
+   function sort_posts() {
+      let to_url = '/profile-posts';
+      to_url += '/sort/' + document.getElementById('post-select').value;
+      window.location.href = to_url;
+   }
+
+</script>
+<style>
+   :root {
+      --primary: #13131A; /* Darker background */
+   }
+
+   body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--primary);
+      color: #FFFFFF; /* White text color */
+   }
+
+   textarea,
+   input {
+      border-radius: 10px;
+      font-size: inherit;
+      border: 1px solid #FFFFFF; /* White border color */
+      color: #FFFFFF;
+      padding: 0.7em 1em;
+      padding-left: 1em;
+      box-sizing: border-box;
+      background-color: #000000; /* Box background color */
+      resize: none;
+   }
+
+   .nav-sidebar {
+      position: fixed;
+      height: 220px;
+      width: max(120px, 11%);
+      top: 50%;
+      transform: translate(0%, -45%);
+      background: var(--primary);
+      color: white;
+      border: 1px solid white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #bd00d6;
+   }
+
+   .nav-sidebar a {
+      text-decoration: none;
+      color: white;
+      display: flex;
+      margin: auto;
+      width: 110px;
+      height: 40px;
+      border-radius: 5px;
+      justify-content: center;
+      align-items: center;
+   }
+
+   .nav-sidebar a:hover {
+      background: #62005e;
+      color: #FFFFFF;
+      transition: 0.3s;
+   }
+
+   .nav-sidebar .active {
+      background-color: white;
+      color: #000000;
+      transition: 0.3s all ease;
+   }
+
+   section {
+      min-height: 300px;
+      background-color: #000000; /* Box background color */
+      padding: 30px;
+      margin-bottom: 20px;
+      border: 2px solid white; /* White border color */
+      border-radius: 10px;
+   }
+
+   #settings a {
+      display: block;
+      text-align: center;
+      margin: 0px auto;
+      width: 250px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: white;
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #13131A;
+      border-radius: 10px;
+   }
+
+   #settings a:hover {
+      background-color: var(--primary);
+      color: white;
+      transition: 0.3s;
+      cursor: pointer;
+   }
+
+   #settings input {
+      width: 50%;
+      margin-right: 0px;
+      display: inline-block;
+   }
+
+   #settings label {
+      width: 120px;
+      display: inline-block;
+   }
+
+   #saved {
+      min-height: 80vh;
+   }
+
+   #settings p {
+      text-align: center;
+   }
+
+   label {
+      text-align: left;
+   }
+
+   .submit {
+      font-size: 17px;
+      width: 30px;
+      height: 30px;
+      color: #FFFFFF;
+      background: linear-gradient(to right, #bd00d6, #e7007fcc);
+      border-radius: 100%;
+      border: 1px solid white;
+   }
+
+   .submit:hover {
+      color: #bd00d6;
+      background: #FFFFFF;
+      border: 1px solid #e7007fcc;
+      transition: 0.3s;
+      cursor: pointer;
+   }
+
+   .post {
+      background-color: #000000 /* Box background color */
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid white; /* White border color */
+   }
+
+   .post-icons {
+      display: flex;
+      justify-content: space-between;
+   }
+
+   .icon-box {
+      text-align: center;
+   }
+
+   .icon-box span {
+      font-size: 12px;
+   }
+
+ 
+
+   .likes.clicked i {
+      color: #313131;
+   }
+
+   .likes.clicked span {
+      color: #313131;
+   }
+
+   .save.clicked {
+      background-color: white;
+   }
+
+   .save.clicked i {
+      color: #313131;
+   }
+
+   .save.clicked span {
+      color: #313131;
+   }
+
+   .tag {
+      background-color: var(--primary);
+      color: white;
+      padding: 3px 5px;
+      border-radius: 5px;
+      font-size: 12px;
+   }
+
+   .timestamp {
+      font-size: 12px;
+      color: #FFFFFF;
+   }
+
+   .over:hover {
+      background-color: #313131;
+      transition: 0.3s;
+   }
+
+   .post-text {
+      padding: 0 10px;
+   }
+
+   .post-text p {
+      color: #FFFFFF;
+   }
+
+   .post-text p.top {
+      font-size: 14px;
+   }
+
+   .post-text p.title {
+      font-size: 18px;
+   }
+
+   .post-text p.desc {
+      font-size: 14px;
+   }
+
+   .post-text span {
+      display: inline-block;
+      margin-right: 5px;
+   }
+</style>
+
+<body>
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="nav-sidebar">
+      <a href="{{ url_for('profile') }}" class="settings">Settings</a>
+      <a href="{{ url_for('profile_notifications') }}" class="notifications">Notifications</a>
+      <a href="{{ url_for('profile_posts') }}" class="posts active">Posts</a>
+      <a href="{{ url_for('profile_saved') }}" class="saved">Saved</a>
+   </div>
+   <div class="content" style="width:70%;margin-left:max(15%, 150px);">
+      <br>
+      <h2 id="title">{{ session.name }}</h2><h3>Open to any projects</h3>
+      {% if user['bio'].replace(" ", "") != "": %}
+      <h3 id="bio">{{ user['bio'] }}</h3>
+      <br><br>
+      {% endif %}
+      <section id="posts">
+         <h3>Posts</h3>
+         <div class="feed">
+            <h4>Total likes: {{ total_likes }}</h4>
+            {% if len > 0: %}
+            Sort Posts by: <select name="post-select" style="background-color: #13131A; border: solid 1px #FFFFFF; color: #FFFFFF;" id="post-select" onchange="sort_posts()">
+               {% if sort == 'newest' %}
+               <option value="newest" selected>Newest</option>
+               {% else %}
+               <option value="newest">Newest</option>
+               {% endif %}
+               {% if sort == 'oldest' %}
+               <option value="oldest" selected>Oldest</option>
+               {% else %}
+               <option value="oldest">Oldest</option>
+               {% endif %}
+               {% if sort == 'popular' %}
+               <option value="popular" selected>Popular</option>
+               {% else %}
+               <option value="popular">Popular</option>
+               {% endif %}
+            </select> 
+            {% for post in user_posts %}
+            <div class="post" style="background-color: #13131A;">
+               <a class="over" style="text-decoration:none;" href="{{ url_for('post',post_id=post['post_id']) }}">
+                  <div class="post-text">
+                     <p class="top">Posted by: <span class="author">{{ post['username'] }}</span>
+                        {% if post['music_genre'] != 'default' %}
+                        to #{{ post['music_genre'] }}
+                        {% endif %}
+                        {% if post['help_needed'] != 'default' %}
+                        and #{{ post['help_needed'] }}
+                        {% endif %}
+                     </p>
+                     {% if post['project_id'] != 0 %}
+                     <span class="tag" style="background-color:var(--primary);color:white;">Project Open</span><br>
+                     {% endif %}
+                     <p class="title">{{ post['title'] }}</p>
+                     {% for para in post['post'] %}
+                     {% if para == "": %}
+                     <p class="desc"><br></p>
+                     {% else %}
+                     <p class="desc">{{ para }}</p>
+                     {% endif %}
+                     {% endfor %}
+                     <br>
+                     {% if post['img'] == 1 %}
+                     <span class="tag">Image Attached</span>
+                     {% endif %}
+                     {% if post['audio'] == 1 %}
+                     <span class="tag">Audio Attached</span>
+                     {% endif %}
+                     {% if post['video'] == 1 %}
+                     <span class="tag">Video Attached</span>
+                     {% endif %}
+                     <span class="timestamp">{{ post['timestamp'][0] }} {{ post['timestamp'][1] }}, {{
+                        post['timestamp'][2] }} {{ post['timestamp'][3] }}:{{ post['timestamp'][4] }}</span>
+                     <br><br>
+                  </div>
+               </a>
+               <div class="post-icons">
+                  {% if session.name and session.name != "" and post['post_id']|string in user['posts_liked'] %}
+                  <div id="likebox-{{ post['post_id'] }}" class="likes clicked" name="clicked" onclick="like(event)">
+                     <div class="icon-box">
+                        <span><i id="i-{{ post['post_id'] }}" style="color: #FFFFFF"
+                              class="fa-solid fa-up-long"></i></span><br>
+                        <span style="color: #FFFFFF" id="likes-{{ post['post_id'] }}" style="font-size:18px">{{
+                           post['likes'] }}</span>
+                     </div>
+                  </div>
+                  {% else %}
+                  <div id="likebox-{{ post['post_id'] }}" class="likes" onclick="like(event)">
+                     <div class="icon-box">
+                        <span><i id="i-{{ post['post_id'] }}" class="fa-solid fa-up-long"></i></span><br>
+                        <span id="likes-{{ post['post_id'] }}" style="font-size:18px">{{ post['likes'] }}</span>
+                     </div>
+                  </div>
+                  {% endif %}
+                  <div class="comments" onclick="window.location.href='/post/{{ post['post_id'] }}';">
+                     <div class="icon-box">
+                        <span><i class="fa-solid fa-comment"></i></span><br>
+                        <span id="comments-{{ post['post_id'] }}" style="font-size:18px">{{ post['comments'] }}</span>
+                     </div>
+                  </div>
+                  <div class="share" onclick="
+                        var shareText = '127.0.0.1:1601{{ url_for('post',post_id=post['post_id']) }}';
+                        navigator.clipboard.writeText(shareText);
+                        document.getElementById('share-{{ post['post_id'] }}').textContent = 'Copied!';
+                        setTimeout(function () {
+                           document.getElementById('share-{{ post['post_id'] }}').textContent = 'Share';
+                        }, 5000);
+                     ">
+                     <div class="icon-box">
+                        <span><i class="fa-solid fa-share"></i></span><br>
+                        <span id="share-{{ post['post_id'] }}" style="font-size:12px">Share</span>
+                     </div>
+                  </div>
+                  {% if session.name and session.name != "" and post['post_id']|string in user['saved'] %}
+                  <div id="savebox-{{ post['post_id'] }}" class="save clicked" name="clicked" onclick="save(event)">
+                     <div class="icon-box">
+                        <span><i id="si-{{ post['post_id'] }}" style="color: #FFFFFF"
+                              class="fa-solid fa-bookmark"></i></span><br>
+                        <span style="color: #FFFFFF;font-size:12px" id="saves-{{ post['post_id'] }}">Saved</span>
+                     </div>
+                  </div>
+                  {% else %}
+                  <div id="savebox-{{ post['post_id'] }}" class="save" onclick="save(event)">
+                     <div class="icon-box">
+                        <span><i id="si-{{ post['post_id'] }}" class="fa-solid fa-bookmark"></i></span><br>
+                        <span id="saves-{{ post['post_id'] }}" style="font-size:12px">Save</span>
+                     </div>
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No posts yet. Click <a href="{{ url_for('create_post') }}">here</a> to make your first post!</p>
+            {% endif %}
+         </div>
+      </section>
+   </div>
+   <br><br><br>
+   {% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+   <meta charset="utf-8">
+   <title>Apply to "{{ project['title'] }}"</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+   
+<script>
+// ... (your JavaScript code)
+</script>
+
+<style>
+   body {
+      background-color: #13131A;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      color: #FFFFFF;
+   }
+
+   .bubble {
+      width: 100%;
+      margin: 0px auto;
+      display: block;
+      min-height: 250px;
+   }
+
+   .left {
+      float: left;
+   }
+
+   .right {
+      float: right;
+   }
+
+   #title {
+      padding-top: 50px;
+   }
+
+   .subtitle {
+      text-align: left;
+   }
+
+   #form-box {
+      border: 1px solid #FFFFFF; /* White stroke */
+      border-radius: 10px;
+      padding: 20px;
+      padding-left: 40px;
+      padding-right: 40px;
+      background-color: #000000;
+   }
+
+   textarea, input {
+      border-radius: 10px;
+      font-size: inherit;
+      border: 1px solid #000000; /* Black border */
+      color: #000000;
+      padding: 0.7em 1em;
+      padding-left: 1em;
+      box-sizing: border-box;
+      background-color: #FFFFFF; /* White background */
+      resize: none;
+   }
+
+   input::placeholder {
+      color: #BFBFBF;
+   }
+
+   textarea:focus, input:focus {
+      color: #00336d;
+   }
+
+   span {
+      margin-bottom: 20px;
+      display: block;
+   }
+
+   ul.checkbox  { 
+      margin: 0; 
+      padding: 0; 
+      margin-left: 20px; 
+      list-style: none; 
+   } 
+
+   ul.checkbox li input { 
+      margin-right: .25em; 
+   } 
+
+   ul.checkbox li { 
+      border: 1px transparent solid; 
+      display: inline-block;
+      width: 12em;
+   }
+
+   #submit {
+      margin: 0px auto;
+      display: block;
+      font-size: 85px;
+      width: 100px;
+      height: 100px;
+      color: #FFFFFF; /* White text */
+      background: linear-gradient(to right, #bd00d6, #e7007fcc);
+      border-radius: 100%;
+      border: 1px solid #FFFFFF; /* White border */
+   }
+
+   #submit:hover {
+      color: #bd00d6;
+      background: #FFFFFF; /* White background */
+      border: 1px solid #e7007fcc;
+      transition: 0.3s;
+      cursor: pointer;
+   }
+
+   #pitch {
+      background-color: #13131A;
+      border: 1px solid #FFFFFF; /* Quick pitch color */
+   }
+</style>
+
+<body>
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="content" style="width:90%">
+      <br>
+      <h2 id="title">Apply to "{{ project['title'] }}"</h2>
+      <h3>{{ project['desc'] }}</h3>
+      <h4>Members:
+         {% for i in range(0, project['usernames']|length): %}
+         {% if i == project['usernames']|length - 1: %}
+         <a href="{{ url_for('profile_outside', username=project['usernames'][i]) }}">{{ project['usernames'][i] }}</a>
+         {% else %}
+         <a href="{{ url_for('profile_outside', username=project['usernames'][i]) }}">{{ project['usernames'][i] }}</a>,
+         {% endif %}
+         {% endfor %}
+      </h4>
+      <div id="form-box">
+         <span>
+            Username: &emsp;{{ session.name }}
+         </span>
+         Quick pitch: <span>
+            <textarea id='pitch' rows="5" style="width:75%"></textarea>
+         </span>
+         <button id="submit" onclick="apply()">+</button>
+      </div>
+   <br><br><br>
+   {% endblock %}
+</body>
+</html>

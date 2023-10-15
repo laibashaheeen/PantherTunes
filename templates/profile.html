@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+   <meta charset="utf-8">
+   <title>Profile</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<script>
+   path = window.location.hostname
+   if (path == '127.0.0.1') {
+      path += ':1601'
+   }
+   // else if (window.location.protocol != 'https:'){
+   //     window.location.href = 'https://domain/sign-in'
+   // }
+
+   var window_url = window.location.protocol + '//' + path;
+   redirect_to = 'profile'
+   let url_string = window.location.href//if there is a redirect value in url it means we need to remember where to rediretc the user to once signed in
+   let url = new URL(url_string);
+   let c = url.searchParams.get('redirect');
+   if (c != null) {
+      redirect_to = c;
+   }
+
+   function delete_post(event) {
+      data = {
+         'action': 'delete',
+         'post_id': event.target.id
+      };
+      httpGetAsyncPost(window_url + '/profile', end_func, data);
+   }
+
+   function edit_bio() {
+      data = {
+         'action': 'edit-bio',
+         'bio': document.getElementById('textbox-bio').value.replaceAll("\n", " ")
+      };
+      if (data['bio'].split(' ').length > 50) {
+         alert('Your bio cannot be above 50 words.');
+         return;
+      }
+      httpGetAsyncPost(window_url + '/profile', end_func, data);
+   }
+
+   function like(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes + 1;
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("i-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'like',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes - 1;
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("i-" + ID.substring(8)).style.color = "white";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unlike',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function save(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Saved";
+         {% endif %}
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("si-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'save',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Save";
+         {% endif %}
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("si-" + ID.substring(8)).style.color = "white";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unsave',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function update_social(event) {
+      var ID = event.currentTarget.id;
+      var handle = document.getElementById('input-' + ID).value;
+      data = {
+         'action': 'update-social',
+         'social': ID,
+         'handle': handle
+      };
+      httpGetAsyncPost(window.location.href, social_updated, data);
+   }
+
+   function action_stored(data) {
+      data = JSON.parse(data);
+      if (data['state'] != 'success') {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function end_func(data) {
+      data = JSON.parse(data)
+      if (data['state'] == 'success') {
+         if (redirect_to != '') {
+            redirect_to = '/' + redirect_to;
+         }
+         window.location.href = window_url + redirect_to;
+      } else {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function social_updated(data) {
+      data = JSON.parse(data)
+      if (data['state'] == 'success') {
+         document.getElementById('success-' + data['id']).style.visibility = 'visible';
+      } else {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function httpGetAsyncPost(theUrl, callback, data) {
+      //alert(JSON.stringify(data));
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function () {
+         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+         }
+      }
+      xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+      //alert('c');
+      xmlHttp.send(JSON.stringify(data));
+      //alert('d');
+   }
+
+   function show_box() {
+      document.getElementById('prompt-line-bio').style.display = "none";
+      document.getElementById('comment-line-bio').style.display = "block";
+      document.getElementById('textbox-bio').value = document.getElementById('bio').textContent;
+   }
+
+   function sort_notifications() {
+      sortType = document.getElementById('notif-select').value;
+      var allNotifs = document.getElementsByClassName('all');
+      if (sortType == 'all') {
+         for (var i = 0; i < allNotifs.length; i++) {
+            allNotifs[i].style.display = 'block';
+         }
+         return;
+      }
+      var allNotifs = document.getElementsByClassName('all');
+      for (var i = 0; i < allNotifs.length; i++) {
+         allNotifs[i].style.display = 'none';
+      }
+      var sortNotifs = document.getElementsByClassName(sortType);
+      for (var i = 0; i < sortNotifs.length; i++) {
+         sortNotifs[i].style.display = 'block';
+      }
+   }
+
+   function sort_posts() {
+      let to_url = '/profile';
+      to_url += '/sort/' + document.getElementById('post-select').value + '#posts';
+      window.location.href = to_url;
+   }
+
+</script>
+
+
+<style>
+
+
+body {
+      background: #13131A;
+      color:#FFFFFF
+}
+
+
+
+    .submit {
+       font-size: 17px;
+       width: 30px;
+       height: 30px;
+       color: #fff;
+       background: linear-gradient(to right, #bd00d6, #e7007fcc);
+       border-radius: 100%;
+       border: 1px solid white;
+    }
+ 
+    .submit:hover {
+       color: #bd00d6;
+       background: #fff;
+       border: 1px solid #e7007fcc;
+       transition: 0.3s;
+       cursor: pointer;
+    }
+ 
+    textarea,
+    input {
+       border-radius: 10px;
+       font-size: inherit;
+       border: 1px solid #FFFFFF;
+       color: #FFFFFF;
+       padding: 0.7em 1em;
+       padding-left: 1em;
+       box-sizing: border-box;
+       background-color: #13131A;
+       resize: none;
+    }
+ 
+    #bio {
+       margin-top: -30px;
+    }
+ 
+    .nav-sidebar {
+       position: fixed;
+       height: 220px;
+       width: max(120px, 11%);
+       top: 50%;
+       transform: translate(0%, -45%);
+       background: #62005e;
+       color: #FFFFFF;
+       border: 1px solid white;
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+    }
+ 
+    .nav-sidebar a {
+       text-decoration: none;
+       color: white;
+       display: flex;
+       margin: auto;
+       width: 110px;
+       height: 40px;
+       border-radius: 5px;
+       justify-content: center;
+       align-items: center;
+    }
+ 
+    .nav-sidebar a:hover {
+       background: #62005e;
+       color: #fff;
+       transition: 0.3s;
+    }
+ 
+    .nav-sidebar .active {
+       background-color: white;
+       color: #13131A;
+       transition: 0.3s all ease;
+    }
+ 
+    section {
+       min-height: 300px;
+       background-color: #000000;
+       padding: 30px;
+       margin-bottom: 20px;
+       border: 2px solid white;
+       border-radius: 10px;
+       
+    }
+ 
+    #settings a {
+       display: block;
+       text-align: center;
+       margin: 0px auto;
+       width: 250px;
+       padding: 5px;
+       margin-bottom: 10px;
+       background-color: #13131A;
+       color: #FFFFFF;
+       text-decoration: none;
+       border: 1px solid white;
+       border-radius: 10px;
+    }
+ 
+    #settings a:hover {
+       background-color: #800080;
+       color: #13131A;
+       transition: 0.3s;
+       cursor: pointer;
+    }
+ 
+    /* ... (existing social icon styles) */
+ 
+    .fa-pencil {
+       color: #800080;
+       margin-left: 5px;
+    }
+
+
+  
+   
+ 
+
+   #settings input {
+      width: 50%;
+      margin-right: 0px;
+      display: inline-block;
+   }
+
+   #settings label {
+      width: 120px;
+      display: inline-block;
+   }
+
+   #saved {
+      min-height: 80vh;
+   }
+
+   #settings p {
+      text-align: center;
+   }
+
+   label {
+      text-align: left;
+      min-width: 100%;
+      align-items: center;
+      font-weight: bold;
+   }
+
+   .social-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+
+  .fa-pencil {
+    color: #FFFFFF;
+    margin-left: 5px;}
+
+    #fa-solid fa-pencil{
+       background-color: #13131A;
+       color: #FFFFFF;
+       text-decoration: none;
+       border: 1px solid white;
+        
+
+    }
+
+  
+
+/* 
+   .duo-column {
+      display: flex;
+      flex-direction: row;
+   } */
+</style>
+
+<body >
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="nav-sidebar">
+      <a href="{{ url_for('profile') }}" class="settings active">Settings</a>
+      <a href="{{ url_for('profile_notifications') }}" class="notifications">Notifications</a>
+      <a href="{{ url_for('profile_posts') }}" class="posts">Posts</a>
+      <a href="{{ url_for('profile_saved') }}" class="saved">Saved</a>
+   </div>
+   <div class="content" style="width:70%;margin-left:max(15%, 150px);">
+      <br>
+      <h2 id="title">{{ session.name }}</h2>
+      <h3>Open to any projects</h3>
+      {% if user['bio'].replace(" ", "") != "": %}
+      <h3 id="bio"></h3>
+      <br><br>
+      {% endif %}
+      <section id="settings">
+         <h3>Settings</h3>
+         <a href="{{ url_for('logout') }}" style="background-color: #13131A;color:white;">Log out</a>
+         <a href="">Change Username</a>
+         {% if user['bio'].replace(" ", "") == "": %}
+         <p id="prompt-line-bio" >Edit Bio <button
+               style="width:5px;height:5px;font-size:7px;padding:0px;padding-bottom:3px; border: none; cursor: pointer; background: #fff;"
+               onclick="show_box()"><i class="fa-solid fa-pencil" style="margin-left: 5px; font-size: 15px;"></i></button></p>
+         {% else %}
+         <p id="prompt-line-bio"> Bio<button
+               style="width:30px;height:30px;font-size:13px;padding:0px;padding-bottom:3px; margin-right: 200px;    width: 30px;
+               height: 30px;
+               font-size: 13px;
+               padding: 0;
+               margin-left: 10px;  border: none; cursor: pointer; background: none;" class="postbtn"
+               onclick="show_box()"><i class="fa-solid fa-pencil"></i></button></p>
+         {% endif %}
+         <div id="comment-line-bio" style="display:none;margin-top:10px;">
+            <textarea id='textbox-bio' rows="5" style="width:75%;margin-bottom:0px;"></textarea>
+            <button style="margin-left:20px;font-size:30px;width:80px;height:80px;position:relative;top:-75px;"
+               class="postbtn" onclick="edit_bio()"><i class="fa-solid fa-pencil" style="background-color: #bd00d6;" ></i></button>
+         </div>
+         <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+              <div style="margin: 10px;">
+                <p style="text-align: center;">
+                  <label style="display: flex; align-items: center;"><i class="fa-brands fa-instagram social-icon"></i>
+                    Instagram <i class="fa-solid fa-pencil" style="margin-left: 5px; margin-bottom: 10px;" ></i>
+                    <button style="display: none;"></button>
+                  </label><br>
+                  <input style="height: 50px; width: 100%; margin: 0 auto;" id="input-instagram" type="text" value="{{ user['instagram'] }}" />
+                  <span style="color: rgb(0, 162, 0); visibility: hidden;" id="success-instagram">Updated!</span>
+                </p>
+              </div>
+              <div style="margin: 10px;">
+                <p style="text-align: center;">
+                  <label style="display: flex; align-items: center;" ><i class="fa-brands fa-tiktok social-icon"></i>
+                    Tiktok <i class="fa-solid fa-pencil" style="margin-left: 5px; margin-bottom: 10px;"></i>
+                    <button style="display: none;"></button>
+                  </label><br>
+                  <input style="height: 50px; width: 100%; margin: 0 auto;" placeholder="" id="input-tiktok" type="text" value="{{ user['tiktok'] }}" />
+                  <span style="color: rgb(0, 162, 0); visibility: hidden;" id="success-tiktok">Updated!</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: center; margin-top: -30px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+              <div style="margin: 10px;">
+                <p style="text-align: center;">
+                  <label style="display: flex; align-items: center;"><i class="fa-brands fa-spotify social-icon"></i>
+                    Spotify <i class="fa-solid fa-pencil" style="margin-left: 5px; margin-bottom: 10px;" ></i>
+                    <button style="display: none;"></button>
+                  </label><br>
+                  <input style="height: 50px; width: 100%; margin: 0 auto;" id="input-spotify" type="text" value="{{ user['spotify'] }}" />
+                  <span style="color: rgb(0, 162, 0); visibility: hidden;" id="success-spotify">Updated!</span>
+                </p>
+              </div>
+              <div style="margin: 10px;">
+                <p style="text-align: center;">
+                  <label style="display: flex; align-items: center;"> <i class="fa-solid fa-music social-icon" style="margin-bottom: 8px;"  ></i>
+                    Apple Music <i class="fa-solid fa-pencil" style="margin-left: 5px; margin-bottom: 10px;"></i>
+                    <button style="display: none;"></button>
+                  </label><br>
+                  <input style="height: 50px; width: 100%; margin: 0 auto;" id="input-apple_music" type="text" value="{{ user['apple_music'] }}" />
+                  <span style="color: rgb(0, 162, 0); visibility: hidden;" id="success-apple_music">Updated!</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+      </section>
+   </div>
+   <br><br><br>
+   <!--
+      <script>
+
+         const sections = document.querySelectorAll("section");
+         const navLi = document.querySelectorAll(".nav-sidebar a");
+         window.onscroll = () => {
+            var current = "";
+            let flagged = false;
+            sections.forEach((section) => {
+               const sectionTop = section.offsetTop;
+               if (pageYOffset >= sectionTop - 60) {
+                  current = section.getAttribute("id");
+               }
+            });
+            navLi.forEach((a) => {
+               a.classList.remove("active");
+               if (a.classList.contains(current)) {
+                  flagged = true;
+                  a.classList.add("active");
+               }
+            });
+            if (!flagged) {
+               document.querySelector(".settings").classList.add("active");
+            }
+         };
+         
+      </script>
+      -->
+   {% endblock %}
+</body>
+
+</html>

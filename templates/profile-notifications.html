@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Notifications</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+   </head>
+   <script>
+
+         function sort_notifications() {
+            sortType = document.getElementById('notif-select').value;
+            var allNotifs = document.getElementsByClassName('all');
+            if (sortType == 'all') {
+               for (var i = 0; i < allNotifs.length; i++) {
+                  allNotifs[i].style.display = 'block';
+               }
+               return;
+            }
+            var allNotifs = document.getElementsByClassName('all');
+            for (var i = 0; i < allNotifs.length; i++) {
+               allNotifs[i].style.display = 'none';
+            }
+            var sortNotifs = document.getElementsByClassName(sortType);
+            for (var i = 0; i < sortNotifs.length; i++) {
+               sortNotifs[i].style.display = 'block';
+            }
+         }
+
+   </script>
+
+
+      <script>
+
+         function sort_notifications() {
+            sortType = document.getElementById('notif-select').value;
+            var allNotifs = document.getElementsByClassName('all');
+            if (sortType == 'all') {
+               for (var i = 0; i < allNotifs.length; i++) {
+                  allNotifs[i].style.display = 'block';
+               }
+               return;
+            }
+            var allNotifs = document.getElementsByClassName('all');
+            for (var i = 0; i < allNotifs.length; i++) {
+               allNotifs[i].style.display = 'none';
+            }
+            var sortNotifs = document.getElementsByClassName(sortType);
+            for (var i = 0; i < sortNotifs.length; i++) {
+               sortNotifs[i].style.display = 'block';
+            }
+         }
+
+   </script>
+
+
+     <script>
+
+         function sort_notifications() {
+            sortType = document.getElementById('notif-select').value;
+            var allNotifs = document.getElementsByClassName('all');
+            if (sortType == 'all') {
+               for (var i = 0; i < allNotifs.length; i++) {
+                  allNotifs[i].style.display = 'block';
+               }
+               return;
+            }
+            var allNotifs = document.getElementsByClassName('all');
+            for (var i = 0; i < allNotifs.length; i++) {
+               allNotifs[i].style.display = 'none';
+            }
+            var sortNotifs = document.getElementsByClassName(sortType);
+            for (var i = 0; i < sortNotifs.length; i++) {
+               sortNotifs[i].style.display = 'block';
+            }
+         }
+
+   </script>
+   <style>
+      :root {
+         --primary: #000000; /* Blue color */
+      }
+
+      body {
+         font-family: 'Roboto', sans-serif;
+         background-color: #13131a; /* Dark background */
+         color: #FFFFFF; /* White text color */
+      }
+
+      .submit {
+         font-size: 17px;
+         width: 30px;
+         height: 30px;
+         color: #FFFFFF;
+         background: linear-gradient(to right, #bd00d6, #e7007fcc);
+         border-radius: 100%;
+         border: 1px solid #FFFFFF;
+      }
+
+      .submit:hover {
+         color: #bd00d6;
+         background: #FFFFFF;
+         border: 1px solid #e7007fcc;
+         transition: 0.3s;
+         cursor: pointer;
+      }
+
+      textarea,
+      input {
+         border-radius: 10px;
+         font-size: inherit;
+         border: 1px solid #FFFFFF;
+         color: #FFFFFF;
+         padding: 0.7em 1em;
+         padding-left: 1em;
+         box-sizing: border-box;
+         background-color: #1a1a21; /* Slightly lighter dark background */
+         resize: none;
+      }
+
+      .nav-sidebar {
+         position: fixed;
+         height: 220px;
+         width: max(120px, 11%);
+         top: 50%;
+         transform: translate(0%, -45%);
+        
+         color: white;
+         border: 1px solid #FFFFFF;
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: center;
+      }
+
+      .nav-sidebar a {
+         text-decoration: none;
+         color: white;
+         display: flex;
+         margin: auto;
+         width: 110px;
+         height: 40px;
+         border-radius: 5px;
+         justify-content: center;
+         align-items: center;
+      }
+
+      .nav-sidebar a:hover {
+         background: #62005e;
+         color: #fff;
+         transition: 0.3s;
+      }
+
+      .nav-sidebar .active {
+         background-color: white;
+         color: #000;
+         transition: 0.3s all ease;
+      }
+
+      section {
+         min-height: 300px;
+         background-color: #000000; /* Black background */
+         padding: 30px;
+         margin-bottom: 20px;
+         border: 2px solid #FFFFFF; /* White border */
+         border-radius: 10px;
+      }
+
+      #settings a {
+         display: block;
+         text-align: center;
+         margin: 0px auto;
+         width: 250px;
+         padding: 10px;
+         margin-bottom: 10px;
+         background-color: white;
+         color: #444;
+         text-decoration: none;
+         border: 1px solid #FFFFFF;
+         border-radius: 10px;
+      }
+
+      #settings a:hover {
+         background-color: #1a006b;
+         color: white;
+         transition: 0.3s;
+         cursor: pointer;
+      }
+
+      #settings input {
+         width: 50%;
+         margin-right: 0px;
+         display: inline-block;
+      }
+
+      #settings label {
+         width: 120px;
+         display: inline-block;
+      }
+
+      #saved {
+         min-height: 80vh;
+      }
+
+      #settings p {
+         text-align: center;
+      }
+
+      label {
+         text-align: left;
+      }
+   </style>
+   <body>
+      {% extends "template.html" %}
+      {% block content %}
+      <div class="nav-sidebar" >
+         <a href="{{ url_for('profile') }}" class="settings">Settings</a>
+         <a href="{{ url_for('profile_notifications') }}" class="notifications active">Notifications</a>
+         <a href="{{ url_for('profile_posts') }}" class="posts">Posts</a>
+         <a href="{{ url_for('profile_saved') }}" class="saved">Saved</a>
+      </div>
+      <div class="content" style="width:70%;margin-left:max(15%, 150px);">
+         <br>
+         <h2 id="title">{{ session.name }}</h2>
+         {% if user['bio'].replace(" ", "") != "": %}
+         <h3 id="bio">{{ user['bio'] }}</h3>
+         {% endif %}
+         <h3>Open to any projects</h3>
+         <section id="notifications">
+            <h3>Notifications</h3>
+            <span style="display:block;text-align:center; >  Select Notification Type: <select name="notif-select" id="notif-select" onchange="sort_notifications()">
+               
+               <option value="all" checked>All</option>
+               <option value="reply">Replies</option>
+               <option value="apply">Applications to Your Projects</option>
+               <option value="app-accept">Accepted Applications</option>
+               <option value="app-deny">Denied Applications</option>
+               <option value="remove">Removals</option>
+               <option value="upgrade">Upgraded to Owner</option>
+               <option value="project-request">Requested to Project</option>
+                
+            </select></span>
+            {% for notif in notifications %}
+            <p class="all {{ notif['type'] }}">
+            {% if notif['unread'] == 1: %}
+            UNREAD:
+            {% endif %}
+            {{ notif['message'] }}
+            {% if notif['type'] == 'reply': %}
+            <button style="background-color: #13131a;color: #FFFFFF; border: solid 1px #FFFFFF;" onclick="window.location.href='{{ notif['link'] }}';">Go to post</button>
+            {% elif notif['type'] == 'app-accept' or notif['type'] == 'upgrade': %}
+            <button style="background-color: #13131a;color: #FFFFFF; border: solid 1px #FFFFFF;" onclick="window.location.href='{{ notif['link'] }}';">Go to project</button>
+            {% elif notif['type'] == 'apply': %}
+            <button style="background-color: #13131a;color: #FFFFFF; border: solid 1px #FFFFFF;" onclick="window.location.href='{{ notif['link'] }}';">Go to applications</button>
+            {% elif notif['type'] == 'remove': %}
+            <button style="background-color: #13131a;color: #FFFFFF; border: solid 1px #FFFFFF;" onclick="window.location.href='{{ notif['link'] }}';">Contest</button>
+            {% elif notif['type'] == 'project-request': %}
+            <button style="background-color: #13131a;color: #FFFFFF; border: solid 1px #FFFFFF;" onclick="window.location.href='{{ notif['link'] }}';">Accept</button>
+            {% endif %}
+            </p>
+            {% endfor %}
+         </section>
+      </div>
+      <br><br><br>
+      <!--
+      <script>
+
+         const sections = document.querySelectorAll("section");
+         const navLi = document.querySelectorAll(".nav-sidebar a");
+         window.onscroll = () => {
+            var current = "";
+            let flagged = false;
+            sections.forEach((section) => {
+               const sectionTop = section.offsetTop;
+               if (pageYOffset >= sectionTop - 60) {
+                  current = section.getAttribute("id");
+               }
+            });
+            navLi.forEach((a) => {
+               a.classList.remove("active");
+               if (a.classList.contains(current)) {
+                  flagged = true;
+                  a.classList.add("active");
+               }
+            });
+            if (!flagged) {
+               document.querySelector(".settings").classList.add("active");
+            }
+         };
+         
+      </script>
+      -->
+      {% endblock %}
+   </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+   <meta charset="utf-8">
+   <title>Contest Error</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+   <style>
+      body {
+         background-color: #13131A;
+         margin: 0;
+         font-family: 'Roboto', sans-serif;
+         color: #FFFFFF;
+      }
+
+      .content {
+         width: 90%;
+         margin: 0 auto;
+         text-align: center;
+         padding-top: 100px;
+      }
+
+      #title {
+         font-size: 2.5em;
+         font-weight: bold;
+         margin-bottom: 20px;
+      }
+
+      h3 {
+         font-size: 1.5em;
+         font-weight: normal;
+      }
+   </style>
+</head>
+<body>
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="content">
+      <h2 id="title">Contest Error</h2>
+      <br><br>
+      <h3>The project for which removal you are contesting cannot be found in any of our databases. The project was likely deleted over 30 days ago.</h3>
+   </div>
+   {% endblock %}
+</body>
+</html>

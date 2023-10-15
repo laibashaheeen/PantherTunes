@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+   <meta charset="utf-8">
+   <title>{{ project['title'] }}</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+   <style>
+      .bubble {
+         width: 100%;
+         margin: 0px auto;
+         display: block;
+         min-height: 250px;
+      }
+
+      .left {
+         float: left;
+      }
+
+      .right {
+         float: right;
+      }
+
+      #title {
+         padding-top: 50px;
+      }
+
+      .subtitle {
+         text-align: left;
+      }
+
+      #applications {
+         border: 2px solid var(--primary);
+         border-radius: 10px;
+         padding-left: 20px;
+         padding-right: 20px;
+         margin: 0px auto;
+         width: 60%;
+         background-color: #000000;
+         border: 1px solid #ffffff;
+         color: #ffffff;
+      }
+
+      .deciders {
+         margin: 0px auto;
+         margin-top: 20px;
+         margin-bottom: 30px;
+         display: flex;
+         justify-content: center;
+         width: 100%;
+      }
+
+      .decide {
+         width: 80px;
+         height: 80px;
+         font-size: 30px;
+         border-radius: 100px;
+         color: #13131A;
+         padding: 10px;
+         
+         border: 2px solid white;
+         background-image: linear-gradient(to right, #6b006b, #1a006b);
+      }
+
+      .decide:hover {
+         background-image: linear-gradient(to right, white, white);
+         box-shadow: 0px 0px 0px white;
+         cursor: pointer;
+         transition: 0.3s;
+         border-color: black;
+         color: #6b006b;
+      }
+
+      .update {
+         width: calc(100% - 60px);
+         margin-top: 15px;
+         border: 1px solid #ffffff;
+         border-radius: 10px;
+         background-color: #13131A;
+         margin-bottom: 30px;
+         padding-left: 30px;
+         padding-right: 30px;
+         color: #ffffff;
+         overflow: hidden;
+      }
+
+      .update .title {
+         margin-top: -10px;
+         margin-bottom: -10px;
+         font-size: 16px;
+      }
+
+      .update .desc {
+         font-size: 14px;
+      }
+
+      .update .top {
+         padding-top: 0px;
+         font-size: 16px;
+      }
+
+      .update .author {
+         margin-left: 0px;
+         margin-right: 0px;
+         color: rgb(0, 24, 133);
+      }
+
+      .update .timestamp {
+         display: inline;
+         float: right;
+         color: #999999;
+         font-size: 13px;
+      }
+
+      body{
+        color: #ffffff;
+        background-color: #13131A;
+      }
+
+      .top{
+        
+
+      }
+
+   </style>
+</head>
+<script>
+
+   function decide() {
+      var ID = event.currentTarget.id;
+      var data = {};
+      if (ID.charAt(0) == 'a') {
+         alert('accept');
+         data = {
+            'action': 'accept',
+            'application_id': ID.substring(7)
+         };
+      } else {
+         alert('deny');
+         data = {
+            'action': 'deny',
+            'application_id': ID.substring(5)
+         };
+      }
+      //httpGetAsyncPost(window.location.href, decision_made, data);
+   }
+
+   function decision_made(data) {
+      data = JSON.parse(data);
+      if (data['state'] == 'success') {
+         window.location.reload();
+      } else {
+         alert('Error: ' + data['state']);
+      }
+   }
+
+   function httpGetAsyncPost(theUrl, callback, data) {
+      //alert(JSON.stringify(data));
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function () {
+         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+         }
+      }
+      xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+      //alert('c');
+      xmlHttp.send(JSON.stringify(data));
+      //alert('d');
+   }
+
+</script>
+
+<body style="background-color: #13131A;">
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="content" style="width:90%">
+      <br>
+      <h2 id="title">{{ project['title'] }}</h2>
+      <div id="sub-nav" class="nav-sidebar">
+         <a href="{{ url_for('project',project_id=project['project_id']) }}" class="settings">Feed</a>
+         <a href="{{ url_for('project_application',project_id=project['project_id']) }}"
+            class="notifications active">Applications</a>
+         <a href="{{ url_for('project_chat',project_id=project['project_id']) }}" class="posts">Chat
+            {% if project['unread'] != 0 %}
+            ({{ project['unread'] }})
+            {% endif %}
+         </a>
+         <a href="{{ url_for('project_posts',project_id=project['project_id']) }}" class="saved">All Posts</a>
+         <a href="{{ url_for('project_settings',project_id=project['project_id']) }}" class="saved">Settings</a>
+      </div>
+      <div id="applications">
+         <p style="font-size:20px;">Applications</p>
+         {% for application in applications: %}
+         <div class="update">
+           
+            <p class="top"  >PITCH FROM <a href="{{ url_for('profile_outside', username=application['username']) }}"
+                  class="user">{{ application['username'] }}</a>:</p>
+            {% for para in application['pitch'] %}
+            {% if para == "": %}
+            <p class="title"><br></p>
+            {% else %}
+            <p class="title">{{ para }}</p>
+            {% endif %}
+            {% endfor %}
+            <p class="timestamp">{{ application['timestamp'][0] }} {{ application['timestamp'][1] }}, {{
+               application['timestamp'][2] }} {{ application['timestamp'][3] }}:{{ application['timestamp'][4] }}</p>
+            <br>
+            {% if project['usernames'].index(session.name) == 0: %}
+            <div class="deciders">
+               <button class="decide accept" id="accept-{{ application['application_id'] }}" onclick="decide()"
+                  style="margin-right:15px;"><i class="fa-solid fa-check"></i></button>
+               <button class="decide deny" id="deny-{{ application['application_id'] }}" onclick="decide()"
+                  style="margin-left:15px;"><i class="fa-sharp fa-solid fa-xmark"></i></button>
+            </div>
+            {% endif %}
+         </div>
+         {% endfor %}
+      </div>
+   </div>
+   <br><br><br>
+   {% endblock %}
+</body>
+
+</html>

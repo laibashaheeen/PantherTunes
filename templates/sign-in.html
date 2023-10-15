@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Sign In</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+
+<script>
+    path = window.location.hostname
+    if (path == '127.0.0.1') {
+        path += ':1601'
+    }
+    // else if (window.location.protocol != 'https:'){
+    //     window.location.href = 'https://domain/sign-in'
+    // }
+
+    var window_url = window.location.protocol + '//' + path;
+
+    redirect_to = ''
+    let url_string = window.location.href//if there is a redirect value in url it means we need to remember where to rediretc the user to once signed in
+    let url = new URL(url_string);
+    let c = url.searchParams.get('redirect');
+    if (c != null) {
+        redirect_to = c;
+    }
+    window.history.pushState({ additionalInformation: 'Cleaning url' }, 'PantherTunes', '?');
+
+    function signin() {
+        console.log("signing in")
+        if (document.getElementById('username').value != '' && document.getElementById('password').value != '') {
+            /*if (localStorage.getItem('user_token') != null){
+                httpGetAsyncPost('/sign-in/sign-out', signed_out,{'user_token':localStorage.getItem('user_token')})
+            }
+            else{*/
+            signin_checked()
+            //}
+        }
+        else {
+            document.getElementById('username_text').innerHTML = 'Please enter a username and password';
+        }
+    }
+
+    function signin_checked() {
+        // document.getElementById('reset_password_prompt').style.display = 'none'
+        // device = detect_device()
+        data = {
+            'username': document.getElementById('username').value,
+            'password': document.getElementById('password').value
+        }
+        httpGetAsyncPost(window_url + '/sign-in', signed_in, data)
+    }
+
+    function signed_in(data) {
+        data = JSON.parse(data)
+        if (data['error_code'] == 0) {
+            localStorage.user_token = data['user_token'];
+            localStorage.username = data['username'];
+            //set the cookie to expire in 200 years time (aka never)
+            document.cookie = 'username = ' + data['username'] + ';expires = Thu, 01 Jan ' + (new Date().getFullYear() + 200) + ' 00:00:00 GMT'
+            sessionStorage.removeItem('profile_pic');
+            if (redirect_to != '') {
+                redirect_to = '/' + redirect_to;
+            }
+            window.location.href = window_url + redirect_to
+        }
+        else if (data['error_code'] == 1) {
+            document.getElementById('username_text').innerHTML = 'Incorrect Username or Password';
+            if (data['has_email'] == true) {//if the user has a recovery email for the given username ask if they need to reset password
+                document.getElementById('reset_password_prompt').style.display = 'block'
+            }
+        }
+        else {
+            document.getElementById('username_text').innerHTML = 'Internal Server Error - ' + data['log'];
+        }
+    }
+
+    function httpGetAsyncPost(theUrl, callback, data) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                callback(xmlHttp.responseText);
+        }
+        xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+        xmlHttp.send(JSON.stringify(data));
+    }
+
+    document.onkeydown = function (evt) {
+        evt = evt || window.event;
+        if (evt.keyCode == 13) {//enter
+            signin()
+        }
+    };
+
+    // ------------------------- FRONT END SCRIPT(S) ------------------------
+
+    function togVisibility() {
+        console.log('invoked');
+
+        let visibility = document.getElementById('visibility');
+        let inputPass = document.getElementById('password');
+
+        if (inputPass.type == 'password') {
+            visibility.name = 'eye-outline';
+            inputPass.type = 'text';
+        }
+        else {
+            visibility.name = 'eye-off-outline';
+            inputPass.type = 'password';
+        }
+
+
+    }
+
+</script>
+
+<style>
+    .icon {
+        height: 60%;
+        position: relative;
+        top: 50%;
+        transform: translate(0%, -50%);
+        margin-right: 5px;
+        margin-left: 10px;
+    }
+
+    input {
+        border-radius: 1em;
+        font-size: inherit;
+        outline: 1px solid transparent;
+        border: none;
+        background-color: #ffffff;
+        width: calc(100% - 4em);
+        color: #ffffff;
+        font-family: sans-serif;
+    }
+
+    input::placeholder {
+        color: #ffffff;
+    }
+
+    input:focus {
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        font-size: inherit;
+        background: rgb(123, 0, 123);
+        border: none;
+        color: white;
+        margin-top: 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        box-sizing: border-box;
+        border-radius: 25px; padding: 10px 0px;
+    }
+    button:hover {
+        background: rgb(84, 0, 84);
+    }
+    @media screen and (max-width: 380px){
+    
+        
+    }
+</style>
+
+<body style="background: #13131A;color: #ffffff;">
+    {% extends "template.html" %}
+    {% block content %}
+    <!-- <div style="height:800px;background-color:rgb(158, 190, 12);" class="content"> -->
+    <main style="height: 100%;">
+        <br><br><br><br><br><br>
+        <div id='login_boxes' style='background: #000000;margin:auto;width:17em; border: 1px solid rgb(206, 204, 204); border-radius: 0.5em; padding: 10px 30px;   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4),
+            0px 0px 0px rgba(0, 0, 0, 0),
+            0px 0px 0px rgba(0, 0, 0, 0),
+            0px 0px 0px rgba(0, 0, 0, 0);'>
+            <div
+                style='width:100%;text-align:center;font-size:1.5em;color:#ffffff;position:relative;font-weight: 700;margin-top: 10px;'>
+                Sign In
+            </div>
+            <div style="margin-top: 20px;">
+                <span style="font-size:0.8em;font-weight: 700;">Username</span>
+            </div>
+            <!-- <div style='width:100%;background-color:#2c413d;border-radius:0.5em; padding:10px 0px;'> -->
+            <input id='username'
+                style="width: 90%; border-radius: 0.5em; padding: 10px 10px; background: #13131A; color: #ffffff; border: 1px solid #ffffff; color: #ffffff;"
+                placeholder='Enter your username'>
+            <div style="margin-top: 10px;">
+                <span style="font-size:0.8em;font-weight: 700;">Password</span>
+            </div>
+
+            <div>
+                <input id='password' class="" type='password' placeholder='Enter your password'
+                    style="width: 90%;background:#13131A;border-radius:0.5em; border: 1px solid #ffffff; padding: 10px 10px; color: #ffffff;margin-bottom: 20px;">
+                <ion-icon id="visibility" onclick="togVisibility()" name="eye-off-outline"
+                    style="position: absolute; margin-top: 10px; left: 56%; cursor: pointer;"></ion-icon>
+            </div>
+
+            <button onclick='signin()'>Sign In</button>
+
+            <div
+                style='width:100%;text-align:center;color:#ffffff;font-size:1em; margin-top: 10px;margin-bottom: 10px;'>
+                Don't have an account?
+                <a id="signup" style="text-decoration: none;color: rgb(221, 0, 221);"
+                    href="{{ url_for('sign_up') }}">Create one!</a>
+            </div>
+            {% endblock %}
+
+
+
+
+</body>
+
+</html>

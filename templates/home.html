@@ -1,0 +1,665 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta charset="utf-8">
+   <title>PantherTunes</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+
+
+
+<style>
+    body {
+       background-color: #13131A;
+       color: #FFFFFF;
+       font-family: 'Roboto', sans-serif;
+       margin: 0;
+    }
+ 
+    #options {
+       width: 70%;
+       margin: 0px auto;
+       overflow: auto;
+       padding-bottom: 30px;
+    }
+ 
+    .column {
+       float: left;
+       width: 33.33%;
+       padding: 30px;
+       box-sizing: border-box;
+       text-align: center;
+    }
+ 
+    #options:after {
+       content: "";
+       display: table;
+       clear: both;
+    }
+ 
+    #left {
+       float: left;
+    }
+ 
+    #right {
+       float: right;
+    }
+ 
+    .divider {
+       background-color: black;
+       width: 100%;
+       height: 2px;
+       overflow: auto;
+    }
+ 
+    .forums {
+       padding-top: 30px;
+       width: calc(100% - 450px);
+       margin-right: 200px;
+       height: 100%;
+       float: right;
+    }
+ 
+    .advanced-search {
+       position: fixed;
+       top: 55px;
+       right: 15px;
+       background-color: #13131A;
+       width: min(270px, 18.5%);
+       height: 100%;
+       overflow-y: scroll;
+       border-left: 2px solid #880484;
+       
+    }
+ 
+    .advanced-search p {
+       margin: 20px;
+       padding-left: 70px;
+       color: #FFFFFF;
+    }
+ 
+    ::-webkit-scrollbar {
+       -webkit-appearance: none;
+       width: 7px;
+    }
+ 
+    ::-webkit-scrollbar-thumb {
+       border-radius: 4px;
+       background-color: rgba(0, 0, 0, .5);
+       box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+    }
+ 
+    .search {
+       margin: 0px auto;
+       width: 70%;
+       display: flex;
+    }
+ 
+    .searchTerm {
+       width: 100%;
+       border: 3px solid #FFFFFF;
+       border-right: none;
+       padding: 5px;
+       height: 20px;
+       border-radius: 5px 0 0 5px;
+       outline: none;
+       color: black;
+       
+    }
+ 
+    .searchTerm:focus {
+       color: #1b14e5;
+    }
+ 
+    .searchButton {
+       width: 60px;
+       height: 32px;
+       border: 1px solid #fff;
+       background: #880484;
+       text-align: center;
+       color: #fff;
+       border-radius: 0 5px 5px 0;
+       cursor: pointer;
+       font-size: 20px;
+      
+    }
+
+    @media screen and (max-width: 380px) {
+
+
+      .advanced-search {
+       position: fixed;
+       top: 55px;
+       right: 15px;
+       background-color: #13131A;
+       width: min(270px, 18.5%);
+       height: 100%;
+       overflow-y: scroll;
+       border-left: 2px solid #880484;
+       display: none;
+       
+    }
+
+     
+
+            .feed {
+                width: 100%;
+                margin-right: 0; /* Adjust margin-right */
+            }
+
+            .filter-options {
+                display: none;
+            }
+
+            .filter-btn {
+                display: block;
+            }
+        
+
+        .filter-btn {
+            display: none;
+            background-color: #000000;
+            color: #FFFFFF;
+            border: solid 1px #FFFFFF;
+            padding: 10px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+
+        .filter-btn:hover {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+
+        .filter-options {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background-color: #13131A;
+            padding: 10px;
+            border: 1px solid #FFFFFF;
+        }
+
+        .filter-options button {
+            background-color: #000000;
+            color: #FFFFFF;
+            border: solid 1px #FFFFFF;
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .filter-options button:hover {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+        .forums {
+    padding-top: 30px;
+    width: calc(100% - 450px);
+    margin-right: 10px;
+    height: 100%;
+    float: right;
+    width: 100%;
+}
+
+element.style {
+    background-color: #000000;
+    color: #FFFFFF;
+    border: solid 1px #FFFFFF;
+}
+
+
+   
+      }
+
+
+ </style>
+
+
+
+<script>
+
+function toggleFilters() {
+            var filterOptions = document.querySelector('.filter-options');
+            filterOptions.style.display = (filterOptions.style.display === 'none' || filterOptions.style.display === '') ? 'block' : 'none';
+        }
+
+   function advanced_search() {
+      var genreToCheck = ["pop", "rock", "r&b", "rap"]
+      var helpToCheck = ["lyrics", "melody", "chords", "production"];
+      var genre_query = "";
+      var help_query = "";
+      var genre_checked = false;
+      var help_checked = false;
+      var i = 0;
+      while (i < genreToCheck.length) {
+         if (document.getElementById(genreToCheck[i]).checked) {
+            genre_query += genreToCheck[i] + "%";
+            genre_checked = true;
+         }
+         i++;
+      }
+      if (genre_checked) {
+         genre_query = genre_query.substr(0, genre_query.length - 1);
+      } else {
+         genre_query = "default";
+      }
+      i = 0;
+      while (i < helpToCheck.length) {
+         if (document.getElementById(helpToCheck[i]).checked) {
+            help_query += helpToCheck[i] + "%";
+            help_checked = true;
+         }
+         i++;
+      }
+      if (help_checked) {
+         help_query = help_query.substr(0, help_query.length - 1);
+      } else {
+         help_query = "default";
+      }
+      if (genre_query == "default" && help_query == "default") {
+         window.location.href = "/";
+      } else {
+         window.location.href = "/search/" + genre_query + "/" + help_query;
+      }
+   }
+
+   function search() {
+      var query = document.getElementById("search-query").value;
+      if (query.replaceAll(" ", "") == "") {
+         return;
+      }
+      window.location.href = "/search/" + query;
+   }
+
+   function like(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         {% if session.name %}
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes + 1;
+         {% endif %}
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("i-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'like',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         var likes = parseInt(document.getElementById("likes-" + ID.substring(8)).textContent);
+         document.getElementById("likes-" + ID.substring(8)).textContent = likes - 1;
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("i-" + ID.substring(8)).style.color = "white";
+         document.getElementById("likes-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unlike',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function save(event) {
+      var ID = event.currentTarget.id;
+      var chosenElement = document.getElementById(ID);
+      if ((event.currentTarget.getAttribute('name') != "clicked" && chosenElement.style.backgroundColor != "white") || (chosenElement.style.backgroundColor == "#313131" || chosenElement.style.backgroundColor == "rgb(49, 49, 49)")) {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Saved";
+         {% endif %}
+         chosenElement.style.backgroundColor = "white";
+         document.getElementById("si-" + ID.substring(8)).style.color = "#313131";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "#313131";
+         data = {
+            'action': 'save',
+            'post_id': ID.substring(8)
+         };
+      } else {
+         {% if session.name %}
+         document.getElementById("saves-" + ID.substring(8)).textContent = "Save";
+         {% endif %}
+         chosenElement.style.backgroundColor = "#313131";
+         document.getElementById("si-" + ID.substring(8)).style.color = "white";
+         document.getElementById("saves-" + ID.substring(8)).style.color = "white";
+         data = {
+            'action': 'unsave',
+            'post_id': ID.substring(8)
+         };
+      }
+      httpGetAsyncPost(window.location.href, action_stored, data);
+   }
+
+   function action_stored(data) {
+      data = JSON.parse(data);
+      if (data['state'] != 'success') {
+         if (data['state'] == 'redirect') {
+            window.location.href = 'sign-in';
+         } else {
+            alert('Error: ' + data['state']);
+         }
+      }
+   }
+
+   function httpGetAsyncPost(theUrl, callback, data) {
+      //alert(JSON.stringify(data));
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function () {
+         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+         }
+      }
+      xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+      //alert('c');
+      xmlHttp.send(JSON.stringify(data));
+      //alert('d');
+   }
+
+
+
+</script>
+
+<body>
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="main-content">
+
+
+      <br>
+      <div>
+      <button type="checked" class="bigbtn1 filter-btn">Post
+       <a href="{{ url_for('sidebar') }}">Post</a>
+      </button>
+
+      <button type="checked" class="bigbtn2 filter-btn">Filter</button>
+     
+      <div class="sidebar" style="background-color: #13131A; border-right: 1px solid #FFFFFF;">
+         {% if not session.name or session.name == "": %}
+         <h3>You are not signed in. Sign in to make posts and start projects!</h3>
+         {% else %}
+         <h3>WELCOME,<br>
+            <div style="text-align: start;display: flex;margin-left: 36%;font-size: 14px;">{{ session.name }}<div>
+         </h3><br><br>
+         <h3>POST YOUR WORK</h3>
+         <a href="{{ url_for('create_post') }}">
+            <button class="postbtn"><i class="fa-solid fa-pen-to-square"></i></button>
+         </a><br><br><br>
+         <!--<a href="{{ url_for('logout') }}">Log out</a>-->
+         <h3>CURRENT PROJECTS</h3><br>
+         {% if len_projects == 0: %}
+         <p>You have no current projects. Make a post to start one!</p>
+         {% else %}
+         {% for i in range(Projects|length) %}
+         <a class="proj-link" href="{{ url_for('project',project_id=Projects[i]['project_id']) }}"><strong>{{ i + 1
+               }}.</strong> {{ Projects[i]['title'] }}
+            {% if Projects[i]['unread'] != 0 %}
+            <span class="notif">{{ Projects[i]['unread'] }}</span>
+            {% endif %}
+         </a><br><br>
+         {% endfor %}
+         {% endif %}
+         {% endif %}
+      </div>
+      </div>
+      <div class="forums">
+
+      
+         <br><br>
+         <div class="search" style="color: #FFFFFF;">
+            <input type="text" id="search-query" class="searchTerm" style="background-color: #000000;color: #FFFFFF;border: solid 1px #FFFFFF;"
+               placeholder="Search here...">
+            <button type="submit" class="searchButton" onclick="search()">
+               <i class="fa fa-search"></i>
+            </button>
+         </div>
+         <div class="feed">
+            {% if genres_queuer and helplist_queuer: %}
+            <p>Searching for: {{ genres_queuer }} and {{ helplist_queuer }}</p>
+            {% elif genres_queuer and not helplist_queuer: %}
+            <p>Searching for: {{ genres_queuer }}</p>
+            {% elif not genres_queuer and helplist_queuer: %}
+            <p>Searching for: {{ helplist_queuer }}</p>
+            {% endif %}
+            {% for post in Posts %}
+            <div class="post">
+               <a class="over" style="text-decoration:none;" href="{{ url_for('post',post_id=post['post_id']) }}">
+                  <div class="post-text">
+                     <p class="top">Posted by: <span class="author">{{ post['username'] }}</span>
+                        {% if post['music_genre'] != 'default' and post['help_needed'] != 'default' %}
+                        to #{{ post['music_genre'] }} and #{{ post['help_needed'] }}
+                        {% elif post['help_needed'] != 'default' %}
+                        to #{{ post['help_needed'] }}
+                        {% elif post['music_genre'] != 'default' %}
+                        to #{{ post['music_genre'] }}
+                        {% endif %}
+                     </p>
+                     {% if post['project_id'] != 0 %}
+                     <span class="tag" style="background-color: var(--primary);color:white;">Project Open</span><br>
+                     {% endif %}
+                     <p class="title">{{ post['title'] }}</h3>
+                        {% for para in post['post'] %}
+                        {% if para == "": %}
+                     <p class="desc"><br></p>
+                     {% else %}
+                     <p class="desc">{{ para }}</p>
+                     {% endif %}
+                     {% endfor %}
+                     <br>
+                     {% if post['img'] == 1 %}
+                     <span class="tag">Image</span>
+                     {% endif %}
+                     {% if post['audio'] == 1 %}
+                     <span class="tag">Audio</span>
+                     {% endif %}
+                     {% if post['video'] == 1 %}
+                     <span class="tag">Video</span>
+                     {% endif %}
+                     <span class="timestamp">{{ post['timestamp'][0] }} {{ post['timestamp'][1] }}, {{
+                        post['timestamp'][2] }} {{ post['timestamp'][3] }}:{{ post['timestamp'][4] }}</span>
+                     <br><br>
+                  </div>
+               </a>
+               <div class="post-icons">
+                  {% if session.name and session.name != "" and post['post_id']|string in user['posts_liked'] %}
+                  <div id="likebox-{{ post['post_id'] }}" class="likes clicked" name="clicked" onclick="like(event)">
+                     <div class="icon-box">
+                        <span><i id="i-{{ post['post_id'] }}" style="color: #FFFFFF"
+                              class="fa-solid fa-up-long"></i></span><br>
+                        <span style="color: #fff" id="likes-{{ post['post_id'] }}" style="font-size:18px">{{
+                           post['likes'] }}</span>
+                     </div>
+                  </div>
+                  {% else %}
+                  <div id="likebox-{{ post['post_id'] }}" class="likes" onclick="like(event)">
+                     <div class="icon-box">
+                        <span><i id="i-{{ post['post_id'] }}" class="fa-solid fa-up-long"></i></span><br>
+                        <span id="likes-{{ post['post_id'] }}" style="font-size:18px">{{ post['likes'] }}</span>
+                     </div>
+                  </div>
+                  {% endif %}
+                  <div class="comments" onclick="window.location.href='post/{{ post['post_id'] }}';">
+                     <div class="icon-box">
+                        <span><i class="fa-solid fa-comment"></i></span><br>
+                        <span id="comments-{{ post['post_id'] }}" style="font-size:18px">{{ post['comments'] }}</span>
+                     </div>
+                  </div>
+                  <div class="share" onclick="
+                        var shareText = '127.0.0.1:1601{{ url_for('post',post_id=post['post_id']) }}';
+                        navigator.clipboard.writeText(shareText);
+                        document.getElementById('share-{{ post['post_id'] }}').textContent = 'Copied!';
+                        setTimeout(function () {
+                           document.getElementById('share-{{ post['post_id'] }}').textContent = 'Share';
+                        }, 5000);
+                     ">
+                     <div class="icon-box">
+                        <span><i class="fa-solid fa-share"></i></span><br>
+                        <span id="share-{{ post['post_id'] }}" style="font-size:12px">Share</span>
+                     </div>
+                  </div>
+                  {% if session.name and session.name != "" and post['post_id']|string in user['saved'] %}
+                  <div id="savebox-{{ post['post_id'] }}" class="save clicked" name="clicked" onclick="save(event)">
+                     <div class="icon-box">
+                        <span><i id="si-{{ post['post_id'] }}" style="color: #FFFFFF"
+                              class="fa-solid fa-bookmark"></i></span><br>
+                        <span style="color: #FFFFFF;font-size:12px" id="saves-{{ post['post_id'] }}">Saved</span>
+                     </div>
+                  </div>
+                  {% else %}
+                  <div id="savebox-{{ post['post_id'] }}" class="save" onclick="save(event)">
+                     <div class="icon-box">
+                        <span><i id="si-{{ post['post_id'] }}" class="fa-solid fa-bookmark"></i></span><br>
+                        <span id="saves-{{ post['post_id'] }}" style="font-size:12px">Save</span>
+                     </div>
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+            {% endfor %}
+            <!--<div class="post">
+                  <p class="title">Good lyrics for a country melody?</h3>
+                  <p class="desc">Let me know what you guys think. I wrote with the chords AMaj, Bmin, Emin, CMaj and then repeating.
+                     For the melody I tried it out on piano, but in the real version, I will use strings and guitar. I do
+                     want collaboration help, so if you know any good lyrics, feel free to let me know. Thanks guys.
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Need some chords</h3>
+                  <p class="desc">Hey everyone! I'm hoping to find some help with a chord progression I'm trying to write for a new song. I'm looking for something a bit mellow and dreamy, but with a bit of energy too. Does anyone have any ideas or tips? Any help would be greatly appreciated!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">What should this lyric be?</h3>
+                  <p class="desc">I'm writing a song and I'm having trouble coming up with the right lyric for a specific line. Does anyone have any suggestions? The context of the line is that the singer is reflecting on a past relationship, and I'm looking for something that conveys a sense of nostalgia and longing.
+                     Thanks in advance for your help!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Good lyrics for a country melody?</h3>
+                  <p class="desc">Let me know what you guys think. I wrote with the chords AMaj, Bmin, Emin, CMaj and then repeating.
+                     For the melody I tried it out on piano, but in the real version, I will use strings and guitar. I do
+                     want collaboration help, so if you know any good lyrics, feel free to let me know. Thanks guys.
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Need some chords</h3>
+                  <p class="desc">Hey everyone! I'm hoping to find some help with a chord progression I'm trying to write for a new song. I'm looking for something a bit mellow and dreamy, but with a bit of energy too. Does anyone have any ideas or tips? Any help would be greatly appreciated!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">What should this lyric be?</h3>
+                  <p class="desc">I'm writing a song and I'm having trouble coming up with the right lyric for a specific line. Does anyone have any suggestions? The context of the line is that the singer is reflecting on a past relationship, and I'm looking for something that conveys a sense of nostalgia and longing.
+                     Thanks in advance for your help!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Good lyrics for a country melody?</h3>
+                  <p class="desc">Let me know what you guys think. I wrote with the chords AMaj, Bmin, Emin, CMaj and then repeating.
+                     For the melody I tried it out on piano, but in the real version, I will use strings and guitar. I do
+                     want collaboration help, so if you know any good lyrics, feel free to let me know. Thanks guys.
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Need some chords</h3>
+                  <p class="desc">Hey everyone! I'm hoping to find some help with a chord progression I'm trying to write for a new song. I'm looking for something a bit mellow and dreamy, but with a bit of energy too. Does anyone have any ideas or tips? Any help would be greatly appreciated!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">What should this lyric be?</h3>
+                  <p class="desc">I'm writing a song and I'm having trouble coming up with the right lyric for a specific line. Does anyone have any suggestions? The context of the line is that the singer is reflecting on a past relationship, and I'm looking for something that conveys a sense of nostalgia and longing.
+                     Thanks in advance for your help!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Good lyrics for a country melody?</h3>
+                  <p class="desc">Let me know what you guys think. I wrote with the chords AMaj, Bmin, Emin, CMaj and then repeating.
+                     For the melody I tried it out on piano, but in the real version, I will use strings and guitar. I do
+                     want collaboration help, so if you know any good lyrics, feel free to let me know. Thanks guys.
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">Need some chords</h3>
+                  <p class="desc">Hey everyone! I'm hoping to find some help with a chord progression I'm trying to write for a new song. I'm looking for something a bit mellow and dreamy, but with a bit of energy too. Does anyone have any ideas or tips? Any help would be greatly appreciated!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+               <div class="post">
+                  <p class="title">What should this lyric be?</h3>
+                  <p class="desc">I'm writing a song and I'm having trouble coming up with the right lyric for a specific line. Does anyone have any suggestions? The context of the line is that the singer is reflecting on a past relationship, and I'm looking for something that conveys a sense of nostalgia and longing.
+                     Thanks in advance for your help!
+                  </p>
+                  <p class="author">Posted by: praveer35</p>
+               </div>
+            </div>-->
+         </div>
+         
+
+         
+
+
+
+         <div class="advanced-search" style="font-size: 12px; border-left: 1px solid #FFFFFF;">
+
+
+            
+    
+        <div class="filter-options">
+            <h3 style="text-align:center; font-size: 18px; font-weight: 600;">Music Category</h3>
+
+
+
+            
+            <p><input type="checkbox" id="pop" {% if genres_queuer and '#pop' in genres_queuer: %} checked {% endif %}>
+               <i class="fa-solid fa-fire"></i> Pop</p>
+            <p><input type="checkbox" id="rock" {% if genres_queuer and '#rock' in genres_queuer: %} checked {% endif
+                  %}> <i class="fa-solid fa-guitar"></i> Rock</p>
+            <p><input type="checkbox" id="r&b" {% if genres_queuer and '#r&b' in genres_queuer: %} checked {% endif %}>
+               <i class="fa-solid fa-water"></i> R&B</p>
+            <p><input type="checkbox" id="rap" {% if genres_queuer and '#rap' in genres_queuer: %} checked {% endif %}>
+               <i class="fa-solid fa-headset"></i> Rap</p>
+            <h3 style="text-align:center; font-size: 18px; font-weight: 600;">Looking For...</h3>
+            <p><input type="checkbox" id="lyrics" {% if helplist_queuer and '#lyrics' in helplist_queuer: %} checked {%
+                  endif %}> <i class="fa-solid fa-pen"></i> Lyrics</p>
+            <p><input type="checkbox" id="melody" {% if helplist_queuer and '#melody' in helplist_queuer: %} checked {%
+                  endif %}> <i class="fa-solid fa-music"></i> Melody</p>
+            <p><input type="checkbox" id="chords" {% if helplist_queuer and '#chords' in helplist_queuer: %} checked {%
+                  endif %}> <i class="fa-solid fa-circle-nodes"></i> Chords</p>
+            <p><input type="checkbox" id="production" {% if helplist_queuer and '#production' in helplist_queuer: %}
+                  checked {% endif %}> <i class="fa-solid fa-wave-square"></i> Production</p>
+            <br>
+            <button class="bigbtn" style="background-color: #000000;color: #FFFFFF;border: solid 1px #FFFFFF;" onclick="advanced_search()">Filter</button>
+
+            
+
+
+         </div>
+      </div>
+      <script>
+         {% if query %}
+         document.getElementById("search-query").value = '{{ query }}';
+         {% endif %}
+      </script>
+      {% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta charset="utf-8">
+   <title>Contact Us</title>
+   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<style>
+   body {
+      background-color: #13131A; /* Background color */
+      color: #FFFFFF; /* Text color */
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+   }
+
+   .bubble {
+      width: 100%;
+      margin: 0px auto;
+   }
+
+   .left {
+      float: left;
+   }
+
+   .right {
+      float: right;
+   }
+
+   #title {
+      padding-top: 30px;
+   }
+
+   .subtitle {
+      text-align: left;
+   }
+
+   .display-flex-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+   }
+
+   .input-subcontainer {
+      width: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+   }
+
+   .input-container input {
+      width: 90%;
+      margin: 5px 0;
+      padding: 5px 0px 5px 10px;
+      border-radius: 5px;
+      border: 1.4px solid #FFFFFF; /* White border */
+      outline: none;
+      background-color: #000000; /* Black background */
+      color: #FFFFFF; /* White text color */
+   }
+
+   #text-area {
+      padding: 5px 0px 50px 10px;
+      background-color: #000000; /* Black background */
+      border: 1.4px solid #FFFFFF; /* White border */
+      color: #FFFFFF; /* White text color */
+   }
+
+   .send-button {
+      padding: 10px 25px 10px 25px;
+      border: none;
+      font-size: 0.7em;
+      border-radius: 10px;
+      background: #880484;
+      cursor: pointer;
+      color: #FFFFFF; /* White text color */
+      margin-left: 73%;
+      margin-top: 20px;
+   }
+
+   .send-button:hover {
+      background: #5c0359;
+   }
+
+   .title {
+      font-size: 2.2em;
+      font-weight: 550;
+      color: #FFFFFF; /* White text color */
+   }
+
+   .contact-links {
+      display: flex;
+      justify-content: center;
+      padding: 20px 0px;
+      color: #FFFFFF; /* White text color */
+      font-size: 13px;
+   }
+
+   .ion-icon {
+      margin-top: 3px;
+      margin-left: 30px;
+   }
+
+   .contact-links span {
+      margin-left: 5px;
+   }
+
+   @media screen and (max-width: 380px)  {
+   
+
+      .input-container input {
+    width: 210%;
+    margin: 5px 0;
+    padding: 5px 0px 5px 10px;
+    border-radius: 5px;
+    border: 1.4px solid #FFFFFF;
+    outline: none;
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.send-button {
+    padding: 10px 25px 10px 25px;
+    border: none;
+    font-size: 0.7em;
+    border-radius: 10px;
+    background: #880484;
+    cursor: pointer;
+    color: #FFFFFF;
+    margin-left: 3px;
+    margin-top: 20px;
+}
+
+.contact-links {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0px;
+    color: #FFFFFF;
+    font-size: 15px;
+    flex-direction: column; /* Change to row */
+}
+
+.ion-icon {
+    margin-top: 3px;
+    margin-left: 5px; /* Adjust margin as needed */
+}
+
+.contact-links span {
+    margin-left: 5px;
+}
+
+}
+
+
+</style>
+
+<body>
+   {% extends "template.html" %}
+   {% block content %}
+   <div class="content" id="contact">
+      <br>
+      <h2 id="title" class="title">Contact Us</h2>
+      <form action="/action_page.php" target="_blank" method="post">
+         <div style="margin:0 16px 8px 16px" class="display-flex-center input-container">
+            <div class="input-subcontainer">
+               <input type="text" placeholder="Name" required name="Name">
+               <input type="text" placeholder="Email" required name="Email">
+               <input id="text-area" type="text" placeholder="Message" required name="Message">
+               <button class="send-button" type="submit">SEND</button>
+            </div>
+         </div>
+      </form>
+      <div class="contact-links">
+         <ion-icon name="location-sharp"></ion-icon><span>Portland, OR</span>
+         <ion-icon class="ion-icon" name="call"></ion-icon><span>Phone:xxxx</span>
+         <ion-icon class="ion-icon" name="mail-sharp"></ion-icon><span>email:mail@gmail.com</span>
+      </div>
+   </div>
+   </div>
+   </div>
+   {% endblock %}
+</body>
+
+</html>

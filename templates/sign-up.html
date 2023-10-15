@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Sign Up</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+
+<script>
+    path = window.location.hostname
+    if (path == '127.0.0.1') {
+        path += ':1601'
+    }
+    // else if (window.location.protocol != 'https:'){
+    //     window.location.href = 'https://domain/sign-in'
+    // }
+
+    var window_url = window.location.protocol + '//' + path;
+
+    redirect_to = ''
+    let url_string = window.location.href//if there is a redirect value in url it means we need to remember where to rediretc the user to once signed in
+    let url = new URL(url_string);
+    let c = url.searchParams.get('redirect');
+    if (c != null) {
+        redirect_to = c;
+    }
+    window.history.pushState({ additionalInformation: 'Cleaning url' }, 'PantherTunes', '?');
+
+    function create_account() {
+        if (document.getElementById('username').value != '' && document.getElementById('password').value != '' && document.getElementById('email').value != '') {
+            console.log("creating account");
+            signup_checked();
+        }
+        else {
+            document.getElementById('error_text').innerHTML = 'Please enter a username, password, and email';
+            //alert('Please enter a username, password, and email');
+        }
+    }
+
+    function signup_checked() {
+        // document.getElementById('reset_password_prompt').style.display = 'none'
+        // device = detect_device()
+        data = {
+            'username': document.getElementById('username').value,
+            'password': document.getElementById('password').value,
+            'email': document.getElementById('email').value
+        };
+        if (data['username'].match(/^[a-zA-Z][a-zA-Z0-9_$-]*$/) == null) {
+            alert("Username must consist of alphanumeric characters, '-', '$', or '_', and start with a letter.");
+            return;
+        } else if (data['password'].length < 8 || data['password'].length > 40) {
+            alert("Password must be between 8 and 40 characters long.");
+            return;
+        } else if (data['email'].match(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,3}$/) == null) {
+            alert("Invalid email address.");
+            return;
+        }
+        document.getElementById('error_text').innerHTML = 'Validating email (~10 sec)';
+        //alert('b');
+        httpGetAsyncPost(window_url + '/sign-up', signed_up, data)
+    }
+
+    function signed_up(data) {
+        //alert('e');
+        data = JSON.parse(data)
+        if (data['state'] == 'email not unique') {
+            document.getElementById('error_text').innerHTML = 'Email already registered.';
+        } else if (data['state'] == 'username not unique') {
+            document.getElementById('error_text').innerHTML = 'Username not unique! Try another username.';
+        } else if (data['state'] == 'done') {
+            //localStorage.user_token = data['user_token'];
+            //localStorage.username = data['username'];
+            //set the cookie to expire in 200 years time (aka never)
+            //document.cookie = 'username = '+data['username']+';expires = Thu, 01 Jan '+(new Date().getFullYear()+200)+' 00:00:00 GMT'
+            sessionStorage.removeItem('profile_pic');
+            if (redirect_to != '') {
+                redirect_to = '/' + redirect_to;
+            }
+            window.location.href = window_url + redirect_to;
+        } else {
+            document.getElementById('error_text').innerHTML = data['state'];
+        }
+        /*else if(data['error_code'] == 1){
+            document.getElementById('username_text').innerHTML = 'Incorrect Username or Password';
+            if (data['has_email'] == true){//if the user has a recovery email for the given username ask if they need to reset password
+                document.getElementById('reset_password_prompt').style.display = 'block'
+            }
+        }
+        else{
+            document.getElementById('username_text').innerHTML = 'Internal Server Error - '+data['log'];
+        }*/
+    }
+
+    function httpGetAsyncPost(theUrl, callback, data) {
+        //alert(JSON.stringify(data));
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                callback(xmlHttp.responseText);
+            }
+        }
+        xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+        //alert('c');
+        xmlHttp.send(JSON.stringify(data));
+        //alert('d');
+    }
+
+    document.onkeydown = function (evt) {
+        evt = evt || window.event;
+        if (evt.keyCode == 13) {//enter
+            signin()
+        }
+    };
+
+
+    // -------------------------- FRONT END SCRIPT(S) -------------------------
+
+
+    function togVisibility() {
+        console.log('invoked');
+
+        let visibility = document.getElementById('visibility');
+        let inputPass = document.getElementById('password');
+
+        if (inputPass.type == 'password') {
+            visibility.name = 'eye-outline';
+            inputPass.type = 'text';
+        }
+        else {
+            visibility.name = 'eye-off-outline';
+            inputPass.type = 'password';
+        }
+
+
+    }
+
+
+</script>
+
+<style>
+    input {
+        border-radius: 0.5em;
+        border: 1px solid #ffffff;
+        width: 100%;
+        color: #ffffff;
+        padding: 10px 26px;
+        box-sizing: border-box;
+        background: url('/static/ui_icons/back.png') no-repeat 0.5em;
+        background-size: 1.4em;
+        margin-bottom: 1em;
+    }
+
+    input::placeholder {
+        color: #ffffff;
+    }
+
+    input:focus {
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        font-size: inherit;
+        background: rgb(123, 0, 123);
+        border: none;
+        color: white;
+        margin-top: 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        box-sizing: border-box;
+        border-radius: 25px;
+        padding: 10px 0px;
+    }
+
+    button:hover {
+        background: rgb(84, 0, 84);
+    }
+
+    a {
+        color: inherit;
+    }
+
+    #email-more-info {
+        position: relative;
+        cursor: pointer;
+    }
+
+    #email-more-info>div {
+        display: none;
+    }
+
+    #email-more-info:hover>div,
+    #email-more-info:focus>div {
+        display: block;
+    }
+</style>
+
+<body style="background: #13131A; color: #ffffff;">
+    {% extends "template.html" %}
+    {% block content %}
+    <main>
+        <br><br><br><br>
+        <div id="signup_boxes" style=" background: #ffffff;margin:auto;width:17em; border: 1px solid rgb(206, 204, 204); background-color: #000000; border-radius: 0.5em; padding: 10px 30px;   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4),
+        0px 0px 0px rgba(0, 0, 0, 0),
+        0px 0px 0px rgba(0, 0, 0, 0),
+        0px 0px 0px rgba(0, 0, 0, 0); margin-top: 15px; margin-bottom: 20px;">
+            <div
+                style='color: #ffffff;text-align:center;font-size:1.7em;margin-bottom:0em;position:relative; font-weight: 700;'>
+                Sign Up
+            </div>
+
+            <div style='width:100%;border-radius:0.5em;height:3em;margin-bottom: 20px;'>
+                <label for="username" style="font-size:0.8em;font-weight: 700;">Username</label>
+                <input onchange='reset_error_messages()' id='username' placeholder="Username" type='text'
+                    style="background-image:url('/static/images/ui_icons/user_icon_white.png');">
+                <div id='username-error' class='error'></div>
+            </div>
+            <label for="password" style="font-size:0.8em;font-weight: 700;">Password</label>
+            <input id='password' placeholder="Password" type='password'
+                style="background-image:url('/static/images/ui_icons/password_icon.png');">
+            <ion-icon id="visibility" onclick="togVisibility()" name="eye-off-outline"
+                style="position: absolute; margin-top: 10px; left: 56%; cursor: pointer;"></ion-icon>
+            <div id='password-error' class='error'></div>
+            <label style="font-size:0.8em;font-weight: 700;" for="email">
+                Email
+            </label>
+            <input id='email' placeholder="Email Address" type='email'
+                style="background-image:url('/static/images/ui_icons/email.png');">
+            <div id='email-error' class='error'></div>
+            <div id='error_text' style='color:#c01717;font-size:1.1em;margin-top:5px'></div>
+            <button style='width:100%;' onclick='create_account()'>Sign Up!</button>
+            <br>
+            <div
+                style='width:100%;text-align:center;color:#ffffff;font-size:1em; margin-top: 10px;margin-bottom: 10px;'>
+                Have an account?
+                <a id="signup" style="text-decoration: none;color: rgb(221, 0, 221);"
+                    href="{{ url_for('sign_in') }}">Sign in!</a>
+            </div>
+
+            {% endblock %}
+        </div>
+</body>
+
+</html>
